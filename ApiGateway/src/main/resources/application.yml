@@ -5,7 +5,7 @@ spring:
   application:
     name: API-GATEWAY
 
-  #Configuration for API Gateway
+  #Configuration for services that will be called from this Gateway
   cloud:
     gateway:
       routes:
