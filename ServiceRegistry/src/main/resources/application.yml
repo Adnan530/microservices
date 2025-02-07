@@ -1,0 +1,8 @@
+eureka:
+  instance:
+    hostname: localhost
+  client: # This configuration is done so that this service registry should not register itself as a client
+    register-with-eureka: false # by default this property is true
+    fetch-register: false # by default this property is true
+server:
+  port: 8761 # by default port is 8761
