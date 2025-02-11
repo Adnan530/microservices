@@ -1,0 +1,15 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: Config-Server
+
+  #Configuration for Config server to fetch configuration from GIT
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Adnan530/microservice-configuration
+          clone-on-start: true
+

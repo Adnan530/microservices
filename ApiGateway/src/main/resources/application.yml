@@ -12,7 +12,7 @@ spring:
         - id: User-Service
           uri: lb://User-Service
           predicates:
-            - Path=/api/**
+            - Path=/api/**,/staff/** #for accessing multiple endpoints or Path=/** will access all urls but it is better to give URL's
 
 eureka:
   instance:
