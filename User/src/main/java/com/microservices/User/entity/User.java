@@ -1,10 +1,7 @@
 package com.microservices.User.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.id.factory.internal.AutoGenerationTypeStrategy;
 
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "Users")
 public class User {
 
