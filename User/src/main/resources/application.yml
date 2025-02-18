@@ -36,7 +36,7 @@ management:
       show-details: always
 
 resilience4j:
-  circuitbreaker:
+  circuitbreaker: # Configuration for circuit breaker
     instances:
       ratingHotelBreaker:
         registerHealthIndicator: true
@@ -48,3 +48,21 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
         slidingWindowType: COUNT_BASED
+
+  retry:
+    instances:
+      ratingHotelRetry:
+        max-attempts: 5                # The number of retry attempts before failing
+        wait-duration: 5s              # Delay between retries (5 seconds)
+
+  rateLimiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s
+        limit-for-period: 2 #maximum number of requests here it is 2
+        wait-duration: 0s
+
+#The rate limiter allows 2 requests every 4 seconds.
+#Once the rate limit (2 requests) is reached, any subsequent requests will not be processed immediately and will be rejected without waiting (because wait-duration is 0s).
+#The rate limit will reset after 4 seconds.
+

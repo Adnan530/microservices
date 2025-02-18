@@ -5,6 +5,10 @@ import com.microservices.User.exceptions.UserNotFoundException;
 import com.microservices.User.service.IUserService;
 import com.microservices.User.dto.UserDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final IUserService userService;
 
@@ -55,22 +61,37 @@ public class UserController {
         return userDTO.map(ResponseEntity::ok).orElseThrow(()-> new UserNotFoundException("User with id " + id + " not found"));
     }
 
+    // This method is used for Circuit Breaker
+    /*
     @GetMapping("/rating/{id}")
     @CircuitBreaker(name = "ratingHotelBreaker", fallbackMethod = "ratingHotelFallback" ) //fallBackMethod property is used to call that method when the current service is down
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
+     */
 
-    //creating fall back method for circuit breakers
+    int retryCount=1;
+    @GetMapping("/rating/{id}")
+    //@Retry(name = "ratingHotelRetry", fallbackMethod = "ratingHotelFallback")
+    @RateLimiter(name = "userRateLimiter", fallbackMethod = "ratingHotelFallback")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        logger.info("Get Single User Handler: UserController");
+        logger.info("Retry count: {}",retryCount);
+        retryCount++;
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
+    }
+
+    //fallback method for circuit breakers and retry mechanism
     public ResponseEntity<User> ratingHotelFallback(Long id, Exception exception){
-        System.out.println("Fallback executed due to exception: " + exception.getMessage());
-        User user = User.builder().name("adnan").
-                email("abc@gmail.com").
-                address("karachi").
+      //  logger.info("Fallback executed due to exception: {}", exception.getMessage());
+        User user = User.builder()
+                .name("adnan")
+                .email("abc@gmail.com")
+                .address("karachi").
                 id(3L).build();
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
-    //creating fall back method for circuit breakers
+    //fallback method for circuit breakers and retry mechanism
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
