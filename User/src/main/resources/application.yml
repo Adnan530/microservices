@@ -49,11 +49,22 @@ resilience4j:
         slidingWindowSize: 10
         slidingWindowType: COUNT_BASED
 
+#Circuit Breaker How it works:
+  #
+  #The circuit breaker starts in the closed state (requests are allowed).
+  #If failures accumulate (e.g., requests consistently fail), the circuit breaker switches to the open state, rejecting requests immediately.
+  #After a predefined time, the circuit breaker enters a half-open state and allows a limited number of requests to pass through to see if the service has recovered. If the service is still failing, it goes back to the open state.
+  #Once the service recovers, the circuit breaker goes back to the closed state.
+
   retry:
     instances:
       ratingHotelRetry:
-        max-attempts: 5                # The number of retry attempts before failing
+        max-attempts: 3                # The number of retry attempts before failing
         wait-duration: 5s              # Delay between retries (5 seconds)
+        interval-function: "exponentialBackoff(500ms, 1.5)"
+        retry-on-exceptions:
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
 
   rateLimiter:
     instances:

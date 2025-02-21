@@ -72,8 +72,9 @@ public class UserController {
 
     int retryCount=1;
     @GetMapping("/rating/{id}")
-    //@Retry(name = "ratingHotelRetry", fallbackMethod = "ratingHotelFallback")
-    @RateLimiter(name = "userRateLimiter", fallbackMethod = "ratingHotelFallback")
+    @Retry(name = "ratingHotelRetry")
+    @CircuitBreaker(name = "ratingHotelBreaker") //fallBackMethod property is used to call that method when the current service is down
+    @RateLimiter(name = "userRateLimiter")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         logger.info("Get Single User Handler: UserController");
         logger.info("Retry count: {}",retryCount);
